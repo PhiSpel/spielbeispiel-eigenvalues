@@ -20,6 +20,8 @@ from plotly.figure_factory import create_quiver
 # Identical to Adam's answer
 import plotly.colors
 
+from streamlit import session_state as state
+
 def get_continuous_color(colorscale, intermed):
     '''# Plotly continuous colorscales assign colors to the range [0, 1]. This function computes the intermediate
     # color for any value in that range.
@@ -71,7 +73,8 @@ def get_continuous_color(colorscale, intermed):
         colortype="rgb",
     )
 
-def update_plot(internal_forces, members,nodes,f_ext,support,onlyviz):
+def update_plot():
+    internal_forces, members, nodes, f_ext, support, onlyviz = state.internal_forces, state.members, state.all_nodes, state.f_ext, state.support, state.onlyviz
 
     fig = go.Figure()
 
@@ -222,4 +225,5 @@ def update_plot(internal_forces, members,nodes,f_ext,support,onlyviz):
             text=member_names
         ))
 
-    return fig, forcemap
+    state.fig = fig
+    state.forcemap = forcemap

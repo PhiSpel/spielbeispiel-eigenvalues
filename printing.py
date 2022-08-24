@@ -9,11 +9,12 @@ import numpy as np
 
 from streamlit import session_state as state
 
+
 ###############################################################################
 # PRINTING OUTPUT
 ###############################################################################
 
-def bmatrix(a, showzeros,matrixtype=''):
+def bmatrix(a, showzeros, matrixtype=''):
     # if matrixtype == 'h':
     #     text = r' \begin{matrix} '
     #     text += '\n'
@@ -45,9 +46,11 @@ def bmatrix(a, showzeros,matrixtype=''):
 
     return text
 
-def print_equations(K, M, f_ext, displacements, n_rods,n_bcs,decimals,textsize,n_nodes,onlyviz,showzeros,connected_nodes,rods_per_node):
-    from eigenvalues_calculations import reduce_K
-    
+
+def print_equations(K, M, f_ext, displacements, n_rods, n_bcs, decimals, textsize, n_nodes, onlyviz, showzeros,
+                    connected_nodes, rods_per_node):
+    from eigenvalues_calculations import reduce_matrix
+
     label_vector = []
     k = 0
     for node in state.all_nodes:
@@ -64,43 +67,44 @@ def print_equations(K, M, f_ext, displacements, n_rods,n_bcs,decimals,textsize,n
         label_vector[k][0] += '}'
         k += 1
     label_vector = np.array(label_vector)
-    label_vector = reduce_K(label_vector,state.all_nodes,rods_per_node,state.support)
-    
+    label_vector = reduce_matrix(label_vector)
+
     def rounding(a):
         a = np.round(a, decimals)
         a[a == 0] = 0
         return a
-    
-    M_f             = -np.dot(M,f_ext)
-    M_f             = rounding(M_f)
-    M               = rounding(M)
-    f_ext           = rounding(f_ext)
-    K               = rounding(K)
-    displacements   = rounding(displacements)
-    
+
+    M_f = -np.dot(M, f_ext)
+    M_f = rounding(M_f)
+    M = rounding(M)
+    f_ext = rounding(f_ext)
+    K = rounding(K)
+    displacements = rounding(displacements)
+
     equation_string = r'$'
     equation_string += textsize
     equation_string += r' \begin{matrix} '
     equation_string += r'\text{nodes} & \text{stiffness matrix}'
     # equation_string += bmatrix(label_vector,'h')
     equation_string += r' & \text{displacements} & -M\cdot f_{ext} & & \\'
-    equation_string += bmatrix(label_vector, showzeros,'v')
+    equation_string += bmatrix(label_vector, showzeros, 'v')
     equation_string += ' & '
-    equation_string += bmatrix(K, showzeros,'b')
-    equation_string += ' & '
-    equation_string += '\cdot '
-    equation_string += bmatrix(displacements, showzeros,'b')
-    equation_string += ' & '
-    equation_string += '='
-    equation_string += bmatrix(-M_f, showzeros,'b')
-    equation_string += ' & '
-    equation_string += '='
-    equation_string += bmatrix(-M, showzeros,'b')
+    equation_string += bmatrix(K, showzeros, 'b')
     equation_string += ' & '
     equation_string += '\cdot '
-    equation_string += bmatrix(f_ext, showzeros,'b')
+    equation_string += bmatrix(displacements, showzeros, 'b')
+    equation_string += ' & '
+    equation_string += '='
+    equation_string += bmatrix(-M_f, showzeros, 'b')
+    equation_string += ' & '
+    equation_string += '='
+    equation_string += bmatrix(-M, showzeros, 'b')
+    equation_string += ' & '
+    equation_string += '\cdot '
+    equation_string += bmatrix(f_ext, showzeros, 'b')
     equation_string += '\end{matrix}$'
     return equation_string
+
 
 # def print_equations(matrix, rhs, internal_forces, n_rods,n_bcs,decimals,textsize,n_nodes,onlyviz,showzeros,connected_nodes):
 #     label_vector = []
